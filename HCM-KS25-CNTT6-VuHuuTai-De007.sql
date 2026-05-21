@@ -151,7 +151,7 @@ WHERE log_time < '2024-05-20';
     INNER JOIN doctors AS d
     ON ap.doctor_id = d.doctor_id
     WHERE ap.status = 'Completed'
-    GROUP BY d.full_name
+    GROUP BY full_name
     HAVING SUM(ap.fee) > 500000;
     
 -- Câu 3:
@@ -187,12 +187,34 @@ WHERE log_time < '2024-05-20';
     
 -- Phần 6: trigger
 -- Câu 1:
-	DELIMITER \\
+DELIMITER \\
+    
     CREATE TRIGGER trg_after_update_status
-    AFTER UPDATE appointments
+    AFTER UPDATE ON appointments
     FOR EACH ROW
     BEGIN
+		IF NEW.status = 'Completed' THEN 
+		INSERT INTO visit_log (record_id, doctor_id, note, log_time)VALUES
+        (record_id,
+        doctor_id,
+        'Visit completed',
+        DEFAULT);
+	END iF;
+    END \\
     
-    END;
-    DELIMITER ;
+DELIMITER ;
+
+-- Câu 2:
+-- DELIMITER \\
+-- 	
+--     CREATE TRIGGER trg_after_update_aappointment
+--     AFTER UPDATE ON appointments
+--     FOR EACH ROW
+--     BEGIN
+-- 		IF status = 'Completed' THEN
+--         rating + 0.1;
+-- 	END IF;
+-- 	END \\
+
+-- DELIMITER ;
 
